@@ -10,6 +10,9 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -33,6 +36,18 @@ jobs:
           name: dbexplorer-debug-apk
           path: app/build/outputs/apk/debug/*.apk
           if-no-files-found: error
+
+      - name: Publish APK to the "latest-debug" release
+        if: github.event_name != 'pull_request'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cp app/build/outputs/apk/debug/app-debug.apk dbexplorer-debug.apk
+          gh release view latest-debug >/dev/null 2>&1 || \
+            gh release create latest-debug --prerelease --target "$GITHUB_SHA" \
+              --title "Latest debug build" --notes "Debug APK from the latest push."
+          gh release edit latest-debug --notes "Debug APK built from $GITHUB_SHA on branch $GITHUB_REF_NAME."
+          gh release upload latest-debug dbexplorer-debug.apk --clobber
 
       - name: Unit tests and ktlint
         run: ./gradlew :core:test :app:testDebugUnitTest ktlintCheck --continue
