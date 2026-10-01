@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Only used until Compose draws its first frame. -->
+    <style name="Theme.DbExplorer" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:windowBackground">@color/window_background</item>
+    </style>
+    <color name="window_background">#FFFCF8FF</color>
+    <color name="launcher_background">#FF1B4F72</color>
+</resources>
